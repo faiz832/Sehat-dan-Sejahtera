@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "803481078668",
+    "project_id": "sehat-sejahtera",
+    "storage_bucket": "sehat-sejahtera.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803481078668:android:ee53fa71374c796dbfa4a9",
+        "android_client_info": {
+          "package_name": "com.aziz.slicing"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7lI6sGA0gCKpCQECgqQNON8yTfcrtwsY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803481078668:android:20131bb1d277628abfa4a9",
+        "android_client_info": {
+          "package_name": "com.sehatsejahtera.app_sehat_sejahtera"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7lI6sGA0gCKpCQECgqQNON8yTfcrtwsY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

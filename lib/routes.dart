@@ -8,6 +8,7 @@ import 'checkup_questions_page.dart';
 import 'result_page.dart';
 import 'onboarding_page.dart';
 import 'search_page.dart';
+import 'detail_article_page.dart';
 
 class Routes {
   static final Map<String, WidgetBuilder> routes = {
@@ -19,6 +20,11 @@ class Routes {
     '/result': (context) => ResultPage(diseaseName: '', percentage: 0),
     '/onboarding': (context) => OnBoardingPage(),
     '/search': (context) => SearchPage(),
+    '/detail': (context) => DetailArticlePage(
+      title: '',
+      imagePath: '',
+      content: '',
+    ),
   };
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
