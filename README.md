@@ -1,4 +1,4 @@
-# slicing
+# magangdesigner adalah akun magang saya
 
 A new Flutter project.
 
