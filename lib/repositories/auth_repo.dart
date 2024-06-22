@@ -1,23 +1,46 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthRepo {
-  final FirebaseAuth _firebaseAuth;
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
 
-  AuthRepo(this._firebaseAuth);
-
-  Future<void> logIn(String email, String password) async {
-    await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+  Future<void> login({required String email, required String password}) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+    } on FirebaseException catch (e) {
+      throw e.message ?? 'Something wrong!';
+    } catch (e) {
+      throw e;
+    }
   }
 
-  Future<void> register(String email, String password) async {
-    await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
-  }
+  Future<void> register({
+    required String email,
+    required String password,
+    required String name,
+    required String phoneNumber,
+  }) async {
+    try {
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-  Future<void> signOut() async {
-    await _firebaseAuth.signOut();
-  }
+      User? user = userCredential.user;
 
-  User? getCurrentUser() {
-    return _firebaseAuth.currentUser;
+      if (user != null) {
+        await _firestore.collection('users').doc(user.uid).set({
+          'email': email,
+          'displayName': name,
+          'phoneNumber': phoneNumber,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
+    } on FirebaseException catch (e) {
+      throw e.message ?? 'Something went wrong!';
+    } catch (e) {
+      throw e;
+    }
   }
 }

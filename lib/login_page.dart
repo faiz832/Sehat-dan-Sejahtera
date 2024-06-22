@@ -1,15 +1,59 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:slicing/bloc/login/login_cubit.dart';
+import 'package:slicing/phone_auth_screen.dart';
 import 'register_page.dart';
-import '../repositories/auth_repo.dart';
 import 'home_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
-class LoginPage extends StatelessWidget {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final emailEdc = TextEditingController();
+  final passEdc = TextEditingController();
+  bool passInvisible = false;
+
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
+      if (gUser == null) return;
+
+      final GoogleSignInAuthentication gAuth = await gUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: gAuth.accessToken,
+        idToken: gAuth.idToken,
+      );
+
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      User? user = userCredential.user;
+
+      if (user != null) {
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'uid': user.uid,
+          'email': user.email,
+          'displayName': user.displayName,
+          'profileImageUrl': user.photoURL,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+            (route) => false,
+      );
+    } catch (e) {
+      print("Error signing in with Google: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +62,7 @@ class LoginPage extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return BlocProvider(
-            create: (context) => LoginCubit(AuthRepo(FirebaseAuth.instance)),
+            create: (context) => LoginCubit(),
             child: Builder(
               builder: (context) {
                 return Scaffold(
@@ -55,7 +99,7 @@ class LoginPage extends StatelessWidget {
                               ),
                               SizedBox(height: 50),
                               TextField(
-                                controller: _emailController,
+                                controller: emailEdc,
                                 decoration: InputDecoration(
                                   labelText: "Email",
                                   labelStyle: TextStyle(
@@ -68,7 +112,7 @@ class LoginPage extends StatelessWidget {
                               ),
                               SizedBox(height: 16),
                               TextField(
-                                controller: _passwordController,
+                                controller: passEdc,
                                 decoration: InputDecoration(
                                   labelText: "Password",
                                   labelStyle: TextStyle(
@@ -77,23 +121,34 @@ class LoginPage extends StatelessWidget {
                                     color: Colors.black,
                                   ),
                                   border: OutlineInputBorder(),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      passInvisible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        passInvisible = !passInvisible;
+                                      });
+                                    },
+                                  ),
                                 ),
-                                obscureText: true,
+                                obscureText: !passInvisible,
                               ),
                               SizedBox(height: 32),
                               SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    final email = _emailController.text;
-                                    final password = _passwordController.text;
+                                    final email = emailEdc.text;
+                                    final password = passEdc.text;
                                     context
                                         .read<LoginCubit>()
-                                        .logIn(email, password);
+                                        .login(email: email, password: password);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Color(0xFF407BFF),
-                                    // Background color
                                     padding: EdgeInsets.symmetric(
                                         vertical: 14.0, horizontal: 132.0),
                                     shape: RoundedRectangleBorder(
@@ -114,18 +169,16 @@ class LoginPage extends StatelessWidget {
                               BlocConsumer<LoginCubit, LoginState>(
                                 listener: (context, state) {
                                   if (state is LoginSuccess) {
-                                    print("Login successful");
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => HomePage()),
                                     );
                                   } else if (state is LoginFailure) {
-                                    print("Login failed: ${state.error}");
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                           content: Text(
-                                              "Login failed: ${state.error}")),
+                                              "Login failed: ${state.msg}")),
                                     );
                                   }
                                 },
@@ -170,19 +223,20 @@ class LoginPage extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   _buildSocialLoginButton("images/google.png",
-                                      () {
-                                    // Handle Google login
-                                  }),
+                                      signInWithGoogle),
                                   SizedBox(width: 16),
                                   _buildSocialLoginButton("images/facebook.png",
-                                      () {
-                                    // Handle Facebook login
-                                  }),
+                                          () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) => PhoneAuthScreen()));
+                                      }),
                                   SizedBox(width: 16),
-                                  _buildSocialLoginButton("images/apple.png",
-                                      () {
-                                    // Handle Apple login
-                                  }),
+                                  _buildSocialLoginButton("images/phone.png",
+                                          () {
+                                        // Handle Apple login
+                                      }),
                                 ],
                               ),
                               SizedBox(height: 32),
@@ -228,7 +282,6 @@ class LoginPage extends StatelessWidget {
             ),
           );
         }
-
         // Display loading indicator while waiting for Firebase to initialize
         return Center(child: CircularProgressIndicator());
       },

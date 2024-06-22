@@ -12,7 +12,20 @@
           "package_name": "com.aziz.slicing"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "803481078668-rd4m4annbar34mftneqo8kibor8m8sm3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aziz.slicing",
+            "certificate_hash": "0dac3e2a5af6d19a0566b9b54fff9491ba8597c2"
+          }
+        },
+        {
+          "client_id": "803481078668-ds6j5u7eav578k6oi77oedsnjaim8n2o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB7lI6sGA0gCKpCQECgqQNON8yTfcrtwsY"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "803481078668-ds6j5u7eav578k6oi77oedsnjaim8n2o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -31,7 +49,12 @@
           "package_name": "com.sehatsejahtera.app_sehat_sejahtera"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "803481078668-ds6j5u7eav578k6oi77oedsnjaim8n2o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB7lI6sGA0gCKpCQECgqQNON8yTfcrtwsY"
@@ -39,7 +62,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "803481078668-ds6j5u7eav578k6oi77oedsnjaim8n2o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

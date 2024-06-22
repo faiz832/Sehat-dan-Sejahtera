@@ -14,7 +14,7 @@ class _SearchPageState extends State<SearchPage> {
     'Jantung',
     'Ginjal',
     'THT',
-    'Syariwan'
+    'Sariawan'
   ];
 
   final List<Map<String, String>> articles = [
@@ -22,6 +22,7 @@ class _SearchPageState extends State<SearchPage> {
       'title': 'Apa Itu Kanker',
       'description': 'This article will look at this subject, providing a brief overview of this subject.',
       'image': 'images/hepatitis.png',
+      'category': 'Jantung',
       'content': 'Waspada! Inilah Beberapa Gejala Diabetes Yang Perlu Kamu Tau!\n\n'
           'Apa Itu Diabetes?\n\n'
           'Diabetes adalah penyakit kronis yang ditandai dengan tingginya kadar gula darah. '
@@ -43,6 +44,7 @@ class _SearchPageState extends State<SearchPage> {
       'title': 'Tanda-Tanda Jantung Bocor',
       'description': 'This article will look at this subject, providing a brief overview of this subject.',
       'image': 'images/tbc.png',
+      'category': 'Jantung',
       'content': 'Tanda-tanda jantung bocor bisa beragam, termasuk nyeri dada, kelelahan, dan lainnya...\n\n'
           'Apa Itu Jantung Bocor?\n\n'
           'Jantung bocor adalah kondisi di mana ada kebocoran pada katup jantung. '
@@ -62,6 +64,7 @@ class _SearchPageState extends State<SearchPage> {
       'title': 'Tanda-Tanda Jantung Bocor',
       'description': 'This article will look at this subject, providing a brief overview of this subject.',
       'image': 'images/malaria.png',
+      'category': 'Jantung',
       'content': 'Tanda-tanda jantung bocor bisa beragam, termasuk nyeri dada, kelelahan, dan lainnya...\n\n'
           'Apa Itu Jantung Bocor?\n\n'
           'Jantung bocor adalah kondisi di mana ada kebocoran pada katup jantung. '
@@ -81,6 +84,47 @@ class _SearchPageState extends State<SearchPage> {
       'title': 'Tanda-Tanda Jantung Bocor',
       'description': 'This article will look at this subject, providing a brief overview of this subject.',
       'image': 'images/hepatitis.png',
+      'category': 'Ginjal',
+      'content': 'Tanda-tanda jantung bocor bisa beragam, termasuk nyeri dada, kelelahan, dan lainnya...\n\n'
+          'Apa Itu Jantung Bocor?\n\n'
+          'Jantung bocor adalah kondisi di mana ada kebocoran pada katup jantung. '
+          'Kondisi ini dapat menyebabkan darah mengalir kembali ke jantung, '
+          'mengurangi efisiensi jantung dalam memompa darah ke seluruh tubuh.\n\n'
+          'Gejala Jantung Bocor\n\n'
+          'Gejala jantung bocor dapat bervariasi tergantung pada tingkat keparahan kondisi. '
+          'Beberapa gejala umum meliputi:\n'
+          '- Nyeri dada\n'
+          '- Kelelahan\n'
+          '- Sesak napas\n'
+          '- Detak jantung tidak teratur\n'
+          '- Pembengkakan pada kaki atau pergelangan kaki\n'
+          '- Pusing atau pingsan.'
+    },
+    {
+      'title': 'Tanda-Tanda Jantung Bocor',
+      'description': 'This article will look at this subject, providing a brief overview of this subject.',
+      'image': 'images/hepatitis.png',
+      'category': 'THT',
+      'content': 'Tanda-tanda jantung bocor bisa beragam, termasuk nyeri dada, kelelahan, dan lainnya...\n\n'
+          'Apa Itu Jantung Bocor?\n\n'
+          'Jantung bocor adalah kondisi di mana ada kebocoran pada katup jantung. '
+          'Kondisi ini dapat menyebabkan darah mengalir kembali ke jantung, '
+          'mengurangi efisiensi jantung dalam memompa darah ke seluruh tubuh.\n\n'
+          'Gejala Jantung Bocor\n\n'
+          'Gejala jantung bocor dapat bervariasi tergantung pada tingkat keparahan kondisi. '
+          'Beberapa gejala umum meliputi:\n'
+          '- Nyeri dada\n'
+          '- Kelelahan\n'
+          '- Sesak napas\n'
+          '- Detak jantung tidak teratur\n'
+          '- Pembengkakan pada kaki atau pergelangan kaki\n'
+          '- Pusing atau pingsan.'
+    },
+    {
+      'title': 'Tanda-Tanda Jantung Bocor',
+      'description': 'This article will look at this subject, providing a brief overview of this subject.',
+      'image': 'images/hepatitis.png',
+      'category': 'Sariawan',
       'content': 'Tanda-tanda jantung bocor bisa beragam, termasuk nyeri dada, kelelahan, dan lainnya...\n\n'
           'Apa Itu Jantung Bocor?\n\n'
           'Jantung bocor adalah kondisi di mana ada kebocoran pada katup jantung. '
@@ -119,6 +163,10 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    List<Map<String, String>> filteredArticles = _selectedIndex == 0
+        ? articles
+        : articles.where((article) => article['category'] == categories[_selectedIndex]).toList();
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -167,9 +215,9 @@ class _SearchPageState extends State<SearchPage> {
             SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
-                itemCount: articles.length,
+                itemCount: filteredArticles.length,
                 itemBuilder: (context, index) {
-                  final article = articles[index];
+                  final article = filteredArticles[index];
                   return GestureDetector(
                     onTap: () => _navigateToDetail(
                       article['title']!,

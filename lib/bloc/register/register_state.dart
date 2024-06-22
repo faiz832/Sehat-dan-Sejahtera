@@ -7,10 +7,14 @@ class RegisterInitial extends RegisterState {}
 
 class RegisterLoading extends RegisterState {}
 
-class RegisterSuccess extends RegisterState {}
+class RegisterSuccess extends RegisterState {
+  final String msg;
+
+  RegisterSuccess(this.msg);
+}
 
 class RegisterFailure extends RegisterState {
-  final String error;
+  final String msg;
 
-  RegisterFailure({required this.error});
+  RegisterFailure(this.msg);
 }

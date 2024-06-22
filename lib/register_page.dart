@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:slicing/bloc/register/register_cubit.dart';
-import '../repositories/auth_repo.dart';
 import 'login_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class RegisterPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class RegisterPage extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return BlocProvider(
-            create: (context) => RegisterCubit(AuthRepo(FirebaseAuth.instance)),
+            create: (context) => RegisterCubit(),
             child: Builder(
               builder: (context) {
                 return Scaffold(
@@ -43,6 +43,19 @@ class RegisterPage extends StatelessWidget {
                                 textAlign: TextAlign.center,
                               ),
                               SizedBox(height: 50),
+                              TextField(
+                                controller: _nameController,
+                                decoration: InputDecoration(
+                                  labelText: "Name",
+                                  labelStyle: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                  ),
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              SizedBox(height: 16),
                               TextField(
                                 controller: _emailController,
                                 decoration: InputDecoration(
@@ -70,6 +83,20 @@ class RegisterPage extends StatelessWidget {
                                 ),
                                 obscureText: true,
                               ),
+                              SizedBox(height: 16),
+                              TextField(
+                                controller: _phoneNumberController,
+                                decoration: InputDecoration(
+                                  labelText: "Phone Number",
+                                  labelStyle: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                  ),
+                                  border: OutlineInputBorder(),
+                                ),
+                                keyboardType: TextInputType.phone,
+                              ),
                               SizedBox(height: 32),
                               SizedBox(
                                 width: double.infinity,
@@ -77,6 +104,8 @@ class RegisterPage extends StatelessWidget {
                                   onPressed: () {
                                     final email = _emailController.text;
                                     final password = _passwordController.text;
+                                    final name = _nameController.text;
+                                    final phoneNumber = _phoneNumberController.text;
 
                                     // Simple validation for email and password
                                     if (email.isEmpty || password.isEmpty) {
@@ -88,7 +117,12 @@ class RegisterPage extends StatelessWidget {
                                         SnackBar(content: Text("Enter a valid email address")),
                                       );
                                     } else {
-                                      context.read<RegisterCubit>().register(email, password);
+                                      context.read<RegisterCubit>().register(
+                                        email: email,
+                                        password: password,
+                                        name: name,
+                                        phoneNumber: phoneNumber,
+                                      );
                                     }
                                   },
                                   style: ElevatedButton.styleFrom(
@@ -119,9 +153,9 @@ class RegisterPage extends StatelessWidget {
                                       MaterialPageRoute(builder: (context) => LoginPage()),
                                     );
                                   } else if (state is RegisterFailure) {
-                                    print("Registration failed: ${state.error}");
+                                    print("Registration failed: ${state.msg}");
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Registration failed: ${state.error}")),
+                                      SnackBar(content: Text("Registration failed: ${state.msg}")),
                                     );
                                   }
                                 },

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:slicing/checkup_page.dart';
 import 'routes.dart';
 import 'detail_article_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -9,6 +14,50 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  bool _isLoading = false;
+  late User _currentUser;
+  late FirebaseFirestore _firestore;
+  late FirebaseStorage _storage;
+
+  String _displayName = '';
+  String _phoneNumber = '';
+  String _createdAt = '';
+  String _profileImageUrl = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _firestore = FirebaseFirestore.instance;
+    _storage = FirebaseStorage.instance;
+    _currentUser = FirebaseAuth.instance.currentUser!;
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      DocumentSnapshot<Map<String, dynamic>> userData = await _firestore.collection('users').doc(_currentUser.uid).get();
+      if (userData.exists) {
+        Timestamp createdAtTimestamp = userData.get('createdAt');
+        setState(() {
+          _displayName = userData.get('displayName') ?? userData.get('name');
+          _phoneNumber = userData.get('phoneNumber') ?? '';
+          _createdAt = DateFormat('dd-MM-yyyy').format(createdAtTimestamp.toDate());
+          _profileImageUrl = userData.get('profileImageUrl') ?? '';
+        });
+      }
+    } catch (e) {
+      print("Error fetching user data: $e");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
 
   void _onItemTapped(int index) {
     setState(() {
@@ -46,22 +95,24 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       CircleAvatar(
-                        backgroundImage: AssetImage('images/profile.png'),
-                        radius: 30,
+                        radius: 40,
+                        backgroundImage: _profileImageUrl.isNotEmpty
+                            ? NetworkImage(_profileImageUrl)
+                            : AssetImage('images/profile.png') as ImageProvider,
                       ),
                       SizedBox(width: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Hello Aprillia!',
+                            'Hello $_displayName!',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            'Monday, 06:30 WIB',
+                            DateFormat('EEEE, HH:mm').format(DateTime.now()),
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey,
@@ -212,41 +263,54 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildCheckUpCard(String title, String assetPath) {
-    return Container(
-      width: 100,
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Image.asset(
-            assetPath,
-            height: 50,
-            fit: BoxFit.contain,
-          ),
-          SizedBox(height: 8),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: _navigateToCheckUpPage,
+      child: Container(
+        width: 100,
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: Offset(0, 3),
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Column(
+          children: [
+            Image.asset(
+              assetPath,
+              height: 50,
+              fit: BoxFit.contain,
+            ),
+            SizedBox(height: 8),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
+  void _navigateToCheckUpPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CheckupPage(),
+      ),
+    );
+  }
+
 
   Widget _buildArticleCard(String title, String description, String assetPath, String content) {
     return GestureDetector(

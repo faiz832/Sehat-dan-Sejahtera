@@ -7,17 +7,21 @@ import '../../repositories/auth_repo.dart';
 part 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
-  final AuthRepo authRepo;
+  LoginCubit() : super(LoginInitial());
 
-  LoginCubit(this.authRepo) : super(LoginInitial());
+  final _repo = AuthRepo();
 
-  Future<void> logIn(String email, String password) async {
+  void login({required String email, required String password}) async {
+    emit(LoginLoading());
+
     try {
-      emit(LoginLoading());
-      await authRepo.logIn(email, password);
-      emit(LoginSuccess());
+      await _repo.login(email: email, password: password);
+
+      emit(LoginSuccess('Login berhasil!'));
     } catch (e) {
-      emit(LoginFailure(error: e.toString()));
+      print(e);
+
+      emit(LoginFailure(e.toString()));
     }
   }
 }
